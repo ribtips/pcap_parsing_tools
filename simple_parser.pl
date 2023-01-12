@@ -21,7 +21,8 @@ sub main {
         read($fh, my $packet_header,16);
         my $ph=interpret_packet_header(\$packet_header);
         read($fh,my $payload,$$ph{'incl_len'});
-        stackwalk(\$payload,0,$$gh{'dlt'});
+        my $struct=stackwalk(\$payload,0,$$gh{'dlt'});
+        print Dumper $struct;
         #if ($$gh{'dlt'} == 1) {
         #    my $eth = ethernet(\$payload);
         #    print Dumper $eth;
