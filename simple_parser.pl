@@ -7,8 +7,8 @@ use Data::Dumper;
 
 use lib "$FindBin::Bin";
 use My::pcapReader qw(interpret_global_header interpret_packet_header);
-use My::Protocols qw(ethernet);
 use My::StackWalk qw(stackwalk);
+use My::Protocols qw(ethernet);
 
 &main;
 
@@ -22,7 +22,7 @@ sub main {
         my $ph=interpret_packet_header(\$packet_header);
         read($fh,my $payload,$$ph{'incl_len'});
         my $struct=stackwalk(\$payload,0,$$gh{'dlt'});
-        print Dumper $struct;
+        #        print Dumper $struct;
         #if ($$gh{'dlt'} == 1) {
         #    my $eth = ethernet(\$payload);
         #    print Dumper $eth;
