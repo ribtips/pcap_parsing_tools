@@ -40,7 +40,7 @@ sub mpls {
         $location+=4;
         $layer++;
         $mpls{$layer}{'label'}=$val >> 12;
-        print "here is my label: $mpls{$layer}{'label'}\n";
+        #print "here is my label: $mpls{$layer}{'label'}\n";
         $mpls{$layer}{'exp_bits'}=($val >> 9) & 0x7;
         $mpls{$layer}{'eos'}=($val >> 8) & 0x1;
         $eos=$mpls{$layer}{'eos'};
@@ -82,7 +82,7 @@ sub tcp {
     my $bytes=shift; #pointer to tcp packet bytes
     my $location=shift; #integer where in the bytes the tcp data is found
     my %tcp=();
-    ($tcp{'src_port'},$tcp{'dest_port'},$tcp{'seq_num'},$tcp{'ack_num'},my $tmp,$tcp{'win_size'},$tcp{'check_sum'},$tcp{'urgency'})=unpack("nnNNnnnn",substr($$bytes,$location));
+    ($tcp{'src_port'},$tcp{'dst_port'},$tcp{'seq_num'},$tcp{'ack_num'},my $tmp,$tcp{'win_size'},$tcp{'check_sum'},$tcp{'urgency'})=unpack("nnNNnnnn",substr($$bytes,$location));
     $tcp{'header_length'}=(($tmp & 0xf000) >> 12)*4;
     $tcp{'reserved'}=($tmp & 0x0f00) >> 8;
     $tcp{'flags'}=$tmp & 0x00ff;

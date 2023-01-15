@@ -34,8 +34,18 @@ sub stackwalk {
     if (exists($link_layer{$dlt})) {
         $link_layer{$dlt}($payload,$location,\%struct,$layer);
     }
-    print Dumper %struct;
-    return \%struct;
+    #print Dumper %struct;
+    my $description=&print_struct_info(\%struct);
+    return (\%struct,$description);
+}
+
+sub print_struct_info {
+    my $struct=shift;
+    my @structure;
+    foreach my $layer (sort {$a<=>$b} keys %{$struct}) {
+        push @structure,"$$struct{$layer}{'name'}:$$struct{$layer}{'info'}|";    
+    }
+    return(join"",@structure);
 }
 
 sub vlan8021q_layer {
@@ -72,7 +82,7 @@ sub mpls_layer {
     }
 
     if (unpack("H2",substr($$payload,$location)) eq "45") {
-        print "Should probably throw this to IPv4...$mpls_label\n";
+        #print "Should probably throw this to IPv4...$mpls_label\n";
         $$struct{$layer}{'info'}=$mpls_label;
         $layer_2{"0800"}($payload,$location,$struct,$layer);
     }
@@ -100,10 +110,10 @@ sub tcp_layer {
     my $struct=shift;
     my $layer=shift;
     $layer++;
-    (my $tcp,$location)=udp($payload,$location);
+    (my $tcp,$location)=tcp($payload,$location);
     $$struct{$layer}{'name'}="TCP";
     $$struct{$layer}{'header'}=$tcp;
-    $$struct{$layer}{'info'}="$$tcp{'source_port'}-$$eth{'dest_port'}";
+    $$struct{$layer}{'info'}="$$tcp{'src_port'}-$$tcp{'dst_port'}";
 }
 
 sub udp_layer {
@@ -115,7 +125,7 @@ sub udp_layer {
     (my $udp,$location)=udp($payload,$location);
     $$struct{$layer}{'name'}="UDP";
     $$struct{$layer}{'header'}=$udp;
-    $$struct{$layer}{'info'}="$$udp{'source_port'}-$$udp{'dest_port'}";
+    $$struct{$layer}{'info'}="$$udp{'src_port'}-$$udp{'dst_port'}";
 }
 
 sub ethernet_layer {
@@ -127,7 +137,7 @@ sub ethernet_layer {
     (my $eth,$location)=ethernet($payload,$location);
     $$struct{$layer}{'name'}="Ethernet";
     $$struct{$layer}{'header'}=$eth;
-    print Dumper %{$struct};
+    #    print Dumper %{$struct};
     if (exists($layer_2{$$eth{'ether_type'}})) {
         $$struct{$layer}{'info'}="$$eth{'source_mac'}-$$eth{'dest_mac'}";
         $layer_2{$$eth{'ether_type'}}($payload,$location,$struct,$layer);
