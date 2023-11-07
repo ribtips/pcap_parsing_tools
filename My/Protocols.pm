@@ -87,7 +87,7 @@ sub tcp {
     $tcp{'reserved'}=($tmp & 0x0f00) >> 8;
     $tcp{'flags'}=$tmp & 0x00ff;
     $location+=$tcp{'header_length'};
-    $tcp{'payload'}=substr($$bytes,$location);
+    #$tcp{'payload'}=substr($$bytes,$location);
     return(\%tcp,$location);
 }
 
