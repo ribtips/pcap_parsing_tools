@@ -19,6 +19,7 @@ my %status=();
 my %cap_stats=();
 my $clear=`clear`;
 my $handle;
+my $timeout=60;
 $|=1;
 
 &main;
@@ -52,12 +53,15 @@ sub print_status_table {
 	print $clear;
 	my $time=time();
 	foreach my $desc (sort keys %status) {
-		print "$desc - $status{$desc}{'count'} - $status{$desc}{'size'}\n";
+		if ($time - $status{$desc}{'time'} > $timeout) {
+			delete($status{$desc});
+			print "Removed $desc\n";
+		}
+		else {
+			print "$desc - $status{$desc}{'count'} - $status{$desc}{'size'}\n";
+		}
 	}
-	pcap_stats($handle,\%cap_stats);
-	print "I've gotten $pack_num\n";
-	print Dumper %cap_stats;
-
+	#pcap_stats($handle,\%cap_stats);
 }
 
 sub network_activity_table {
@@ -65,7 +69,6 @@ sub network_activity_table {
 	$status{$desc}{'size'}+=$size;
 	$status{$desc}{'time'}=$time;
 	$status{$desc}{'count'}++;
-	#print "$desc - $status{$desc}{'count'} - $status{$desc}{'time'} $status{$desc}{'size'}\n";
 }
 
 sub determine_tcp {
